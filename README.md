@@ -8,7 +8,9 @@ This project is a trend-aware recommendation and analysis agent that can:
 
 - detect trending products
 - analyze demand and popularity signals
-- combine semantic + keyword + web trend retrieval
+- combine semantic + keyword + hybrid + realtime web retrieval
+- scrape Daraz Bangladesh product data for live ecommerce signals
+- use Tavily for web search and trend discovery
 - support Bangla, Banglish, and English user queries
 - explain why a product is trending with evidence-based reasoning
 
@@ -25,7 +27,7 @@ The runtime flow is built with LangGraph:
 2. `vector_db` → pgvector semantic retrieval
 3. `keyword_db` → PostgreSQL keyword retrieval
 4. `rank` → reciprocal-rank fusion (RRF) merge
-5. `web` (conditional) → realtime web signal retrieval
+5. `web` (conditional) → Tavily search + Daraz scraping + live trend signals
 6. `generate` → final trend-aware response
 
 ## Main files
@@ -37,6 +39,7 @@ The runtime flow is built with LangGraph:
 - `nodes/` — node-level pipeline logic
 - `dataset/` — CSV data + ingestion utilities
 - `database_connection/` — DB connectivity checks
+- `nodes/web_search.py` — Tavily search and Daraz scraping
 
 ## Data sources used by the agent
 
@@ -44,6 +47,8 @@ The runtime flow is built with LangGraph:
 - PostgreSQL review tables (expanding in next phase)
 - pgvector semantic similarity
 - realtime web search signals (trend support)
+- Daraz Bangladesh scraping results
+- Tavily search results
 - hybrid merge/rerank logic
 
 ## Setup
@@ -58,7 +63,7 @@ source myvenv/bin/activate
 ### 2) Install dependencies
 
 ```bash
-pip install langchain langgraph langchain-groq langchain-community sqlalchemy pgvector sentence-transformers pandas psycopg2-binary duckduckgo-search
+pip install langchain langgraph langchain-groq langchain-community sqlalchemy pgvector sentence-transformers pandas psycopg2-binary requests beautifulsoup4 python-dotenv tavily-python
 ```
 
 ### 3) Configure environment variables
@@ -67,6 +72,7 @@ Create `.env` in project root:
 
 ```env
 GROQ_API_KEY=your_groq_api_key_here
+TAVILY_API_KEY=your_tavily_api_key_here
 ```
 
 ### 4) Configure database
@@ -89,6 +95,18 @@ python3 app.py
 git add .
 git status
 ```
+
+## Hybrid search and live ecommerce signals
+
+The system now combines multiple retrieval layers:
+
+- semantic search from pgvector
+- keyword matching from PostgreSQL
+- hybrid merging and ranking
+- Tavily web search for fresh signals
+- Daraz Bangladesh scraping for product-level live context
+
+This makes the agent stronger for real Bangladesh ecommerce queries like trending items, price-sensitive recommendations, and category demand checks.
 
 ## Bangladesh market focus
 
